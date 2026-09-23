@@ -1,0 +1,738 @@
+<title>Landers Ventas &amp; Logística</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#004589; --blue-ink:#001A44; --gold:#F4B942; --green:#3f8f79; --red:#b24a39;
+    --bg:#f6f4f2; --surface:#ffffff; --surface-2:#efece8; --ink:#001A44; --ink-soft:#3c4a5e;
+    --muted:#7a8494; --border:#e2dfda; --border-strong:#cdc7c0;
+    --chip-bg:#eef2f7; --track:#e7e2dc;
+    --good-bg:#eaf6f1; --good-fg:#1f6f57; --good-line:#bfe4d6;
+    --bad-bg:#fbecea; --bad-fg:#96382a; --bad-line:#f0c9c2;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0b1626; --surface:#101f36; --surface-2:#15263f; --ink:#eef2f7; --ink-soft:#c3cddb;
+      --muted:#8b97ab; --border:#22334d; --border-strong:#2c405c;
+      --chip-bg:#15263f; --track:#1c2e48;
+      --good-bg:#0f2b24; --good-fg:#6fd3b3; --good-line:#1c4437;
+      --bad-bg:#2e1712; --bad-fg:#f0a08f; --bad-line:#4a2620;
+      --blue:#5b95d6; --gold:#f4b942; --green:#4CA891; --red:#e0705c;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0b1626; --surface:#101f36; --surface-2:#15263f; --ink:#eef2f7; --ink-soft:#c3cddb;
+    --muted:#8b97ab; --border:#22334d; --border-strong:#2c405c;
+    --chip-bg:#15263f; --track:#1c2e48;
+    --good-bg:#0f2b24; --good-fg:#6fd3b3; --good-line:#1c4437;
+    --bad-bg:#2e1712; --bad-fg:#f0a08f; --bad-line:#4a2620;
+    --blue:#5b95d6; --gold:#f4b942; --green:#4CA891; --red:#e0705c;
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box}
+  body{background:var(--bg); color:var(--ink); font-family:"IBM Plex Sans",system-ui,sans-serif; padding-inline:20px; font-variant-numeric:tabular-nums;}
+  h1,h2,h3{font-family:"Manrope",system-ui,sans-serif; text-wrap:balance; margin:0;}
+  .wrap{max-width:1240px; margin:0 auto;}
+
+  /* ---- top bar ---- */
+  .topbar{position:sticky; top:env(safe-area-inset-top,0px); z-index:20; background:var(--bg); padding-block:16px 10px; border-bottom:1px solid var(--border);}
+  .title-row{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; background:var(--blue); padding:10px 12px; border-radius:10px;}
+  .brand{display:flex; align-items:center; gap:12px; min-width:0;}
+  .brand-logo{width:52px; height:52px; object-fit:contain; flex:none; background:#fff; border-radius:8px; padding:4px;}
+  .title-row h1{font-size:22px; font-weight:800; color:#fff;}
+  :root[data-theme="dark"] .title-row h1, @media (prefers-color-scheme:dark){ }
+  .subtitle{font-size:12.5px; color:rgba(255,255,255,.82); margin-top:2px;}
+  .filters{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;}
+  .filter{display:flex; flex-direction:column; gap:4px;}
+  .filter label{font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:600;}
+  select{appearance:none; background:var(--surface); color:var(--ink); border:1px solid var(--border-strong); border-radius:8px; padding:7px 30px 7px 11px; font:600 13px "IBM Plex Sans",sans-serif; cursor:pointer;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%237a8494'/></svg>");
+    background-repeat:no-repeat; background-position:right 11px center; min-width:140px;}
+  select:focus-visible{outline:2px solid var(--blue); outline-offset:1px;}
+  .reset-btn{align-self:flex-end; background:none; border:1px solid var(--border-strong); color:var(--ink-soft); border-radius:8px; padding:7px 12px; font:600 12.5px "IBM Plex Sans",sans-serif; cursor:pointer;}
+  .reset-btn:hover{background:var(--surface-2);}
+
+  main{padding-block:20px 48px;}
+  section{margin-top:32px;}
+  .section-head{display:flex; align-items:baseline; gap:10px; margin-bottom:14px;}
+  .section-head h2{font-size:17px; font-weight:800;}
+  .section-head .dot{width:9px;height:9px;border-radius:50%;flex:none;}
+  .section-head .n{font-size:12px; color:var(--muted); margin-left:auto;}
+
+  /* ---- KPI tiles ---- */
+  .kpi-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px;}
+  .kpi{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px;}
+  .kpi .lbl{font-size:11.5px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.04em;}
+  .kpi .val{font-family:"Manrope",sans-serif; font-size:24px; font-weight:800; margin-top:6px; color:var(--ink);}
+  .kpi .delta{display:inline-flex; align-items:center; gap:4px; margin-top:7px; font-size:12px; font-weight:700; padding:2px 7px; border-radius:20px;}
+  .delta.up{color:var(--good-fg); background:var(--good-bg);}
+  .delta.down{color:var(--bad-fg); background:var(--bad-bg);}
+  .delta.flat{color:var(--muted); background:var(--surface-2);}
+
+  /* ---- panels / charts ---- */
+  .grid-2{display:grid; grid-template-columns:1.3fr 1fr; gap:14px;}
+  @media (max-width:820px){.grid-2{grid-template-columns:1fr;}}
+  .panel{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px 18px 14px;}
+  .panel h3{font-size:13.5px; font-weight:700; margin-bottom:2px;}
+  .panel .hint{font-size:11.5px; color:var(--muted); margin-bottom:10px;}
+  svg text{fill:var(--ink-soft); font-family:"IBM Plex Sans",sans-serif;}
+  .gridline{stroke:var(--border); stroke-width:1;}
+  .axis-lbl{font-size:10.5px; fill:var(--muted);}
+  .val-lbl{font-size:11px; font-weight:700; fill:var(--ink);}
+  .legend{display:flex; gap:14px; margin-bottom:8px; flex-wrap:wrap;}
+  .legend .item{display:flex; align-items:center; gap:6px; font-size:12px; color:var(--ink-soft); font-weight:600;}
+  .legend .sw{width:11px;height:11px;border-radius:3px;flex:none;}
+
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th{text-align:right; font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); font-weight:700; padding:7px 8px; border-bottom:1px solid var(--border-strong);}
+  th:first-child, td:first-child{text-align:left;}
+  td{text-align:right; padding:8px; border-bottom:1px solid var(--border); font-weight:500;}
+  tr:last-child td{border-bottom:none;}
+  .tbl-wrap{overflow-x:auto;}
+  .pos{color:var(--good-fg); font-weight:700;}
+  .neg{color:var(--bad-fg); font-weight:700;}
+
+  /* ---- alerts ---- */
+  .alert-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px;}
+  .alert{border-radius:12px; padding:14px 16px; border:1px solid; display:flex; gap:12px; align-items:flex-start;}
+  .alert.good{background:var(--good-bg); border-color:var(--good-line);}
+  .alert.bad{background:var(--bad-bg); border-color:var(--bad-line);}
+  .alert .stripe{width:4px; align-self:stretch; border-radius:3px; flex:none;}
+  .alert.good .stripe{background:var(--green);}
+  .alert.bad .stripe{background:var(--red);}
+  .alert .body{flex:1;}
+  .alert .head{display:flex; justify-content:space-between; gap:8px; font-weight:700; font-size:13.5px;}
+  .alert.good .head{color:var(--good-fg);}
+  .alert.bad .head{color:var(--bad-fg);}
+  .alert .metric{font-family:"Manrope",sans-serif; font-weight:800; font-size:19px; margin-top:4px;}
+  .alert .rule{font-size:11px; color:var(--muted); margin-top:6px; line-height:1.4;}
+  .finding{background:var(--chip-bg); border:1px solid var(--border); border-radius:12px; padding:14px 16px; font-size:13px; color:var(--ink-soft); line-height:1.55; margin-top:14px;}
+  .finding b{color:var(--ink); font-weight:700;}
+
+  /* ---- lectura ejecutiva ---- */
+  .narrative{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 20px;}
+  .narrative-scope{font-size:11.5px; color:var(--muted); margin-bottom:12px;}
+  .narrative-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px;}
+  .narr-block .narr-lbl{display:flex; align-items:center; gap:7px; font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:6px;}
+  .narr-block .narr-lbl .dot{width:8px;height:8px;border-radius:50%;flex:none;}
+  .narr-block p{font-size:13.5px; line-height:1.55; color:var(--ink-soft); margin:0;}
+  .narr-block p b{color:var(--ink); font-weight:700;}
+
+  /* ---- watch cards (Cali / Barranquilla) ---- */
+  .watch-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:14px;}
+  .watch-card{background:var(--surface); border:1px solid var(--border-strong); border-radius:14px; padding:16px 18px; border-top:3px solid var(--gold);}
+  .watch-card h4{font-family:"Manrope",sans-serif; font-size:15px; font-weight:800; margin-bottom:10px; display:flex; align-items:center; gap:8px;}
+  .watch-card h4 .badge{font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; background:var(--chip-bg); color:var(--ink-soft); padding:2px 8px; border-radius:20px;}
+  .watch-metrics{display:grid; gap:8px; margin-bottom:12px;}
+  .watch-metric{display:flex; justify-content:space-between; align-items:baseline; gap:10px; font-size:12.5px; padding:7px 0; border-bottom:1px dashed var(--border);}
+  .watch-metric:last-child{border-bottom:none;}
+  .watch-metric .wm-name{color:var(--ink-soft); font-weight:500;}
+  .watch-metric .wm-change{font-weight:700; font-family:"Manrope",sans-serif; white-space:nowrap;}
+  .watch-note{font-size:12px; line-height:1.5; color:var(--ink-soft); background:var(--chip-bg); border-radius:9px; padding:10px 12px; margin-bottom:8px;}
+  .watch-note b{color:var(--ink);}
+  .watch-investigate{font-size:12.5px; line-height:1.5; color:var(--ink-soft);}
+  .watch-investigate .il{font-weight:700; color:var(--ink); display:block; margin-bottom:3px; font-size:11.5px; text-transform:uppercase; letter-spacing:.04em;}
+
+  /* ---- acciones ---- */
+  .actions-list{display:grid; gap:10px;}
+  .action-item{display:flex; gap:12px; align-items:flex-start; background:var(--surface); border:1px solid var(--border); border-radius:11px; padding:13px 16px;}
+  .action-item .num{flex:none; width:26px; height:26px; border-radius:50%; background:var(--blue); color:#fff; display:flex; align-items:center; justify-content:center; font-family:"Manrope",sans-serif; font-weight:800; font-size:12.5px;}
+  :root[data-theme="dark"] .action-item .num, @media (prefers-color-scheme:dark){ }
+  .action-item p{margin:0; font-size:13.5px; line-height:1.5; color:var(--ink-soft);}
+  .action-item p b{color:var(--ink);}
+
+  /* ---- alert legend ---- */
+  .alert-legend{font-size:11.5px; color:var(--muted); background:var(--chip-bg); border:1px solid var(--border); border-radius:9px; padding:9px 12px; margin-bottom:14px; line-height:1.5;}
+  .alert-legend b{color:var(--ink-soft);}
+  .alert .kind{font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin-top:6px;}
+
+  footer{margin-top:40px; padding-top:16px; border-top:1px solid var(--border); font-size:11.5px; color:var(--muted); line-height:1.6; padding-bottom:10px;}
+</style>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="title-row">
+      <div class="brand">
+        <img class="brand-logo" src="logo.jfif" alt="Logo de Landers">
+        <div>
+          <h1>Ventas &amp; Logística — Landers</h1>
+          <div class="subtitle">Datos reales de <code>Informe_Ventas_y_Logistica.xlsx</code> · Enero–Junio 2026 · 96 registros de ventas, 24 de logística</div>
+        </div>
+      </div>
+    </div>
+    <div class="filters">
+      <div class="filter">
+        <label for="f-mes">Mes</label>
+        <select id="f-mes"></select>
+      </div>
+      <div class="filter">
+        <label for="f-region">Región</label>
+        <select id="f-region"></select>
+      </div>
+      <div class="filter">
+        <label for="f-cat">Categoría (solo Ventas)</label>
+        <select id="f-cat"></select>
+      </div>
+      <button class="reset-btn" id="reset">Limpiar filtros</button>
+    </div>
+  </div>
+
+  <main>
+    <section id="sec-kpi">
+      <div class="section-head"><span class="dot" style="background:var(--blue)"></span><h2>Indicadores clave</h2><span class="n" id="kpi-scope"></span></div>
+      <div class="kpi-grid" id="kpi-grid"></div>
+    </section>
+
+    <section>
+      <div class="section-head"><span class="dot" style="background:var(--blue)"></span><h2>Ventas y rentabilidad</h2></div>
+      <div class="grid-2">
+        <div class="panel">
+          <h3>Ingresos y margen por mes</h3>
+          <div class="hint">Suma de Ingreso (COP) y Margen (COP), según filtros activos</div>
+          <div class="legend">
+            <span class="item"><span class="sw" style="background:var(--blue)"></span>Ingresos</span>
+            <span class="item"><span class="sw" style="background:var(--gold)"></span>Margen</span>
+          </div>
+          <div id="chart-line-ventas"></div>
+        </div>
+        <div class="panel">
+          <h3>Ingresos por región</h3>
+          <div class="hint">Suma de Ingreso (COP)</div>
+          <div id="chart-bar-region"></div>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:14px">
+        <h3>Rentabilidad por categoría</h3>
+        <div class="hint">Margen % = DIVIDE( Margen, Ingresos ) — nunca promedio de porcentajes ya calculados</div>
+        <div class="tbl-wrap"><table id="tbl-categoria"></table></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head"><span class="dot" style="background:var(--green)"></span><h2>Logística y operación</h2></div>
+      <div class="grid-2">
+        <div class="panel">
+          <h3>% Entregas a tiempo por mes</h3>
+          <div class="hint">DIVIDE( Entregados a tiempo, Pedidos totales )</div>
+          <div id="chart-line-log"></div>
+        </div>
+        <div class="panel">
+          <h3>Devoluciones por región</h3>
+          <div class="hint">Suma de Devoluciones</div>
+          <div id="chart-bar-dev"></div>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:14px">
+        <h3>Desempeño por región</h3>
+        <div class="tbl-wrap"><table id="tbl-region"></table></div>
+      </div>
+    </section>
+
+    <section id="sec-narrativa">
+      <div class="section-head"><span class="dot" style="background:var(--blue)"></span><h2>Lectura ejecutiva</h2></div>
+      <div class="narrative">
+        <div class="narrative-scope" id="narr-scope"></div>
+        <div class="narrative-grid" id="narrative-grid"></div>
+      </div>
+    </section>
+
+    <section id="sec-watch">
+      <div class="section-head"><span class="dot" style="background:var(--red)"></span><h2>Situaciones que requieren seguimiento</h2><span class="n">Periodo completo Enero–Junio, independiente de los filtros</span></div>
+      <div class="watch-grid" id="watch-grid"></div>
+    </section>
+
+    <section id="sec-actions">
+      <div class="section-head"><span class="dot" style="background:var(--green)"></span><h2>¿Qué haría a continuación?</h2></div>
+      <div class="actions-list">
+        <div class="action-item"><div class="num">1</div><p><b>Profundizar el diagnóstico logístico de Cali</b> — revisar capacidad operativa, tiempos de preparación/despacho y cobertura logística en los meses donde más se deterioró el indicador de entregas a tiempo.</p></div>
+        <div class="action-item"><div class="num">2</div><p><b>Revisar capacidad e inventario de Barranquilla frente al crecimiento de pedidos</b> — el volumen de pedidos casi se duplicó en el periodo mientras el inventario cayó; conviene confirmar si la operación tiene la capacidad para sostener ese ritmo.</p></div>
+        <div class="action-item"><div class="num">3</div><p><b>Analizar devoluciones por región y categoría</b> para identificar si el patrón de aumento es generalizado o se concentra en puntos específicos de la operación.</p></div>
+        <div class="action-item"><div class="num">4</div><p><b>Validar con el negocio los umbrales de alerta</b> (30% de margen, 90% de entregas a tiempo, 5% de devoluciones) antes de convertirlos en reglas de monitoreo productivas — en este ejercicio son propuestas analíticas, no estándares oficiales.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head"><span class="dot" style="background:var(--gold)"></span><h2>Alertas y oportunidades</h2><span class="n" id="alert-scope"></span></div>
+      <div class="alert-legend"><b>Nota:</b> los umbrales usados abajo (Margen % &lt; 30%, Entregas a tiempo &lt; 90%, Devoluciones &gt; 5%) son <b>reglas analíticas propuestas</b> para este ejercicio, no estándares definidos en el Excel original. Deben validarse con el negocio antes de usarse como reglas productivas.</div>
+      <div class="alert-grid" id="alert-grid"></div>
+    </section>
+
+    <footer>
+      Todos los cálculos se ejecutan en el navegador a partir de los 120 registros originales del Excel (96 Ventas + 24 Logística), sin agregados pre-calculados ni datos inventados.
+      Margen %, % Entregas a tiempo y % Devoluciones se calculan siempre como razón de sumas (DIVIDE), no como promedio de porcentajes.
+      Tiempo promedio de entrega se pondera por Pedidos totales; Inventario se promedia (es una foto de stock, no un flujo acumulable).
+      Los umbrales de alerta (Margen &lt; 30%, Entregas a tiempo &lt; 90%, Devoluciones &gt; 5%) son reglas de monitoreo propuestas, no estándares provistos en los datos originales.
+    </footer>
+  </main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var DATA = {"ventas": [{"Mes": "Enero", "Región": "Bogotá", "Categoría": "Electrónica", "Unidades vendidas": 53, "Ingreso (COP)": 45000000, "Costo (COP)": 32400000, "Margen (COP)": 12600000, "Margen (%)": 0.28}, {"Mes": "Febrero", "Región": "Bogotá", "Categoría": "Electrónica", "Unidades vendidas": 57, "Ingreso (COP)": 48600000, "Costo (COP)": 34992000, "Margen (COP)": 13608000, "Margen (%)": 0.28}, {"Mes": "Marzo", "Región": "Bogotá", "Categoría": "Electrónica", "Unidades vendidas": 62, "Ingreso (COP)": 52488000, "Costo (COP)": 37791000, "Margen (COP)": 14697000, "Margen (%)": 0.2800068587105624}, {"Mes": "Abril", "Región": "Bogotá", "Categoría": "Electrónica", "Unidades vendidas": 67, "Ingreso (COP)": 56687000, "Costo (COP)": 40815000, "Margen (COP)": 15872000, "Margen (%)": 0.27999364933759063}, {"Mes": "Mayo", "Región": "Bogotá", "Categoría": "Electrónica", "Unidades vendidas": 72, "Ingreso (COP)": 61222000, "Costo (COP)": 44080000, "Margen (COP)": 17142000, "Margen (%)": 0.2799973865603868}, {"Mes": "Junio", "Región": "Bogotá", "Categoría": "Electrónica", "Unidades vendidas": 78, "Ingreso (COP)": 66120000, "Costo (COP)": 47606000, "Margen (COP)": 18514000, "Margen (%)": 0.28000604960677555}, {"Mes": "Enero", "Región": "Bogotá", "Categoría": "Hogar", "Unidades vendidas": 122, "Ingreso (COP)": 22000000, "Costo (COP)": 13200000, "Margen (COP)": 8800000, "Margen (%)": 0.4}, {"Mes": "Febrero", "Región": "Bogotá", "Categoría": "Hogar", "Unidades vendidas": 126, "Ingreso (COP)": 22660000, "Costo (COP)": 13596000, "Margen (COP)": 9064000, "Margen (%)": 0.4}, {"Mes": "Marzo", "Región": "Bogotá", "Categoría": "Hogar", "Unidades vendidas": 130, "Ingreso (COP)": 23340000, "Costo (COP)": 14004000, "Margen (COP)": 9336000, "Margen (%)": 0.4}, {"Mes": "Abril", "Región": "Bogotá", "Categoría": "Hogar", "Unidades vendidas": 134, "Ingreso (COP)": 24040000, "Costo (COP)": 14424000, "Margen (COP)": 9616000, "Margen (%)": 0.4}, {"Mes": "Mayo", "Región": "Bogotá", "Categoría": "Hogar", "Unidades vendidas": 138, "Ingreso (COP)": 24761000, "Costo (COP)": 14857000, "Margen (COP)": 9904000, "Margen (%)": 0.3999838455635879}, {"Mes": "Junio", "Región": "Bogotá", "Categoría": "Hogar", "Unidades vendidas": 142, "Ingreso (COP)": 25504000, "Costo (COP)": 15302000, "Margen (COP)": 10202000, "Margen (%)": 0.40001568381430364}, {"Mes": "Enero", "Región": "Bogotá", "Categoría": "Moda", "Unidades vendidas": 250, "Ingreso (COP)": 30000000, "Costo (COP)": 15000000, "Margen (COP)": 15000000, "Margen (%)": 0.5}, {"Mes": "Febrero", "Región": "Bogotá", "Categoría": "Moda", "Unidades vendidas": 260, "Ingreso (COP)": 31200000, "Costo (COP)": 15600000, "Margen (COP)": 15600000, "Margen (%)": 0.5}, {"Mes": "Marzo", "Región": "Bogotá", "Categoría": "Moda", "Unidades vendidas": 270, "Ingreso (COP)": 32448000, "Costo (COP)": 16224000, "Margen (COP)": 16224000, "Margen (%)": 0.5}, {"Mes": "Abril", "Región": "Bogotá", "Categoría": "Moda", "Unidades vendidas": 281, "Ingreso (COP)": 33746000, "Costo (COP)": 16873000, "Margen (COP)": 16873000, "Margen (%)": 0.5}, {"Mes": "Mayo", "Región": "Bogotá", "Categoría": "Moda", "Unidades vendidas": 292, "Ingreso (COP)": 35096000, "Costo (COP)": 17548000, "Margen (COP)": 17548000, "Margen (%)": 0.5}, {"Mes": "Junio", "Región": "Bogotá", "Categoría": "Moda", "Unidades vendidas": 304, "Ingreso (COP)": 36500000, "Costo (COP)": 18250000, "Margen (COP)": 18250000, "Margen (%)": 0.5}, {"Mes": "Enero", "Región": "Bogotá", "Categoría": "Deportes", "Unidades vendidas": 72, "Ingreso (COP)": 18000000, "Costo (COP)": 11160000, "Margen (COP)": 6840000, "Margen (%)": 0.38}, {"Mes": "Febrero", "Región": "Bogotá", "Categoría": "Deportes", "Unidades vendidas": 73, "Ingreso (COP)": 18360000, "Costo (COP)": 11383000, "Margen (COP)": 6977000, "Margen (%)": 0.38001089324618736}, {"Mes": "Marzo", "Región": "Bogotá", "Categoría": "Deportes", "Unidades vendidas": 75, "Ingreso (COP)": 18727000, "Costo (COP)": 11611000, "Margen (COP)": 7116000, "Margen (%)": 0.3799861163026646}, {"Mes": "Abril", "Región": "Bogotá", "Categoría": "Deportes", "Unidades vendidas": 76, "Ingreso (COP)": 19102000, "Costo (COP)": 11843000, "Margen (COP)": 7259000, "Margen (%)": 0.38001256412941053}, {"Mes": "Mayo", "Región": "Bogotá", "Categoría": "Deportes", "Unidades vendidas": 78, "Ingreso (COP)": 19484000, "Costo (COP)": 12080000, "Margen (COP)": 7404000, "Margen (%)": 0.38000410593307327}, {"Mes": "Junio", "Región": "Bogotá", "Categoría": "Deportes", "Unidades vendidas": 79, "Ingreso (COP)": 19873000, "Costo (COP)": 12321000, "Margen (COP)": 7552000, "Margen (%)": 0.3800130830775424}, {"Mes": "Enero", "Región": "Medellín", "Categoría": "Electrónica", "Unidades vendidas": 35, "Ingreso (COP)": 30000000, "Costo (COP)": 21600000, "Margen (COP)": 8400000, "Margen (%)": 0.28}, {"Mes": "Febrero", "Región": "Medellín", "Categoría": "Electrónica", "Unidades vendidas": 36, "Ingreso (COP)": 30900000, "Costo (COP)": 22248000, "Margen (COP)": 8652000, "Margen (%)": 0.28}, {"Mes": "Marzo", "Región": "Medellín", "Categoría": "Electrónica", "Unidades vendidas": 37, "Ingreso (COP)": 31827000, "Costo (COP)": 22915000, "Margen (COP)": 8912000, "Margen (%)": 0.28001382474000064}, {"Mes": "Abril", "Región": "Medellín", "Categoría": "Electrónica", "Unidades vendidas": 39, "Ingreso (COP)": 32782000, "Costo (COP)": 23603000, "Margen (COP)": 9179000, "Margen (%)": 0.28000122018180706}, {"Mes": "Mayo", "Región": "Medellín", "Categoría": "Electrónica", "Unidades vendidas": 40, "Ingreso (COP)": 33765000, "Costo (COP)": 24311000, "Margen (COP)": 9454000, "Margen (%)": 0.2799940767066489}, {"Mes": "Junio", "Región": "Medellín", "Categoría": "Electrónica", "Unidades vendidas": 41, "Ingreso (COP)": 34778000, "Costo (COP)": 25040000, "Margen (COP)": 9738000, "Margen (%)": 0.28000460060958077}, {"Mes": "Enero", "Región": "Medellín", "Categoría": "Hogar", "Unidades vendidas": 111, "Ingreso (COP)": 20000000, "Costo (COP)": 12000000, "Margen (COP)": 8000000, "Margen (%)": 0.4}, {"Mes": "Febrero", "Región": "Medellín", "Categoría": "Hogar", "Unidades vendidas": 113, "Ingreso (COP)": 20400000, "Costo (COP)": 12240000, "Margen (COP)": 8160000, "Margen (%)": 0.4}, {"Mes": "Marzo", "Región": "Medellín", "Categoría": "Hogar", "Unidades vendidas": 116, "Ingreso (COP)": 20808000, "Costo (COP)": 12485000, "Margen (COP)": 8323000, "Margen (%)": 0.39999038831218764}, {"Mes": "Abril", "Región": "Medellín", "Categoría": "Hogar", "Unidades vendidas": 118, "Ingreso (COP)": 21224000, "Costo (COP)": 12734000, "Margen (COP)": 8490000, "Margen (%)": 0.4000188465887674}, {"Mes": "Mayo", "Región": "Medellín", "Categoría": "Hogar", "Unidades vendidas": 120, "Ingreso (COP)": 21649000, "Costo (COP)": 12989000, "Margen (COP)": 8660000, "Margen (%)": 0.4000184766040002}, {"Mes": "Junio", "Región": "Medellín", "Categoría": "Hogar", "Unidades vendidas": 123, "Ingreso (COP)": 22082000, "Costo (COP)": 13249000, "Margen (COP)": 8833000, "Margen (%)": 0.4000090571506204}, {"Mes": "Enero", "Región": "Medellín", "Categoría": "Moda", "Unidades vendidas": 292, "Ingreso (COP)": 35000000, "Costo (COP)": 17500000, "Margen (COP)": 17500000, "Margen (%)": 0.5}, {"Mes": "Febrero", "Región": "Medellín", "Categoría": "Moda", "Unidades vendidas": 306, "Ingreso (COP)": 36750000, "Costo (COP)": 18375000, "Margen (COP)": 18375000, "Margen (%)": 0.5}, {"Mes": "Marzo", "Región": "Medellín", "Categoría": "Moda", "Unidades vendidas": 322, "Ingreso (COP)": 38588000, "Costo (COP)": 19294000, "Margen (COP)": 19294000, "Margen (%)": 0.5}, {"Mes": "Abril", "Región": "Medellín", "Categoría": "Moda", "Unidades vendidas": 338, "Ingreso (COP)": 40517000, "Costo (COP)": 20258000, "Margen (COP)": 20259000, "Margen (%)": 0.5000123404990497}, {"Mes": "Mayo", "Región": "Medellín", "Categoría": "Moda", "Unidades vendidas": 355, "Ingreso (COP)": 42543000, "Costo (COP)": 21272000, "Margen (COP)": 21271000, "Margen (%)": 0.49998824718520085}, {"Mes": "Junio", "Región": "Medellín", "Categoría": "Moda", "Unidades vendidas": 372, "Ingreso (COP)": 44670000, "Costo (COP)": 22335000, "Margen (COP)": 22335000, "Margen (%)": 0.5}, {"Mes": "Enero", "Región": "Medellín", "Categoría": "Deportes", "Unidades vendidas": 60, "Ingreso (COP)": 15000000, "Costo (COP)": 9300000, "Margen (COP)": 5700000, "Margen (%)": 0.38}, {"Mes": "Febrero", "Región": "Medellín", "Categoría": "Deportes", "Unidades vendidas": 61, "Ingreso (COP)": 15300000, "Costo (COP)": 9486000, "Margen (COP)": 5814000, "Margen (%)": 0.38}, {"Mes": "Marzo", "Región": "Medellín", "Categoría": "Deportes", "Unidades vendidas": 62, "Ingreso (COP)": 15606000, "Costo (COP)": 9676000, "Margen (COP)": 5930000, "Margen (%)": 0.3799820581827502}, {"Mes": "Abril", "Región": "Medellín", "Categoría": "Deportes", "Unidades vendidas": 64, "Ingreso (COP)": 15918000, "Costo (COP)": 9869000, "Margen (COP)": 6049000, "Margen (%)": 0.3800100515140093}, {"Mes": "Mayo", "Región": "Medellín", "Categoría": "Deportes", "Unidades vendidas": 65, "Ingreso (COP)": 16236000, "Costo (COP)": 10066000, "Margen (COP)": 6170000, "Margen (%)": 0.380019709288002}, {"Mes": "Junio", "Región": "Medellín", "Categoría": "Deportes", "Unidades vendidas": 66, "Ingreso (COP)": 16561000, "Costo (COP)": 10268000, "Margen (COP)": 6293000, "Margen (%)": 0.3799891310911177}, {"Mes": "Enero", "Región": "Cali", "Categoría": "Electrónica", "Unidades vendidas": 29, "Ingreso (COP)": 25000000, "Costo (COP)": 18000000, "Margen (COP)": 7000000, "Margen (%)": 0.28}, {"Mes": "Febrero", "Región": "Cali", "Categoría": "Electrónica", "Unidades vendidas": 30, "Ingreso (COP)": 25500000, "Costo (COP)": 18360000, "Margen (COP)": 7140000, "Margen (%)": 0.28}, {"Mes": "Marzo", "Región": "Cali", "Categoría": "Electrónica", "Unidades vendidas": 31, "Ingreso (COP)": 26010000, "Costo (COP)": 18727000, "Margen (COP)": 7283000, "Margen (%)": 0.2800076893502499}, {"Mes": "Abril", "Región": "Cali", "Categoría": "Electrónica", "Unidades vendidas": 31, "Ingreso (COP)": 26530000, "Costo (COP)": 19102000, "Margen (COP)": 7428000, "Margen (%)": 0.27998492272898606}, {"Mes": "Mayo", "Región": "Cali", "Categoría": "Electrónica", "Unidades vendidas": 32, "Ingreso (COP)": 27061000, "Costo (COP)": 19484000, "Margen (COP)": 7577000, "Margen (%)": 0.27999704371604894}, {"Mes": "Junio", "Región": "Cali", "Categoría": "Electrónica", "Unidades vendidas": 32, "Ingreso (COP)": 27602000, "Costo (COP)": 19873000, "Margen (COP)": 7729000, "Margen (%)": 0.28001594087384973}, {"Mes": "Enero", "Región": "Cali", "Categoría": "Hogar", "Unidades vendidas": 100, "Ingreso (COP)": 18000000, "Costo (COP)": 10800000, "Margen (COP)": 7200000, "Margen (%)": 0.4}, {"Mes": "Febrero", "Región": "Cali", "Categoría": "Hogar", "Unidades vendidas": 102, "Ingreso (COP)": 18360000, "Costo (COP)": 11016000, "Margen (COP)": 7344000, "Margen (%)": 0.4}, {"Mes": "Marzo", "Región": "Cali", "Categoría": "Hogar", "Unidades vendidas": 104, "Ingreso (COP)": 18727000, "Costo (COP)": 11236000, "Margen (COP)": 7491000, "Margen (%)": 0.4000106797671811}, {"Mes": "Abril", "Región": "Cali", "Categoría": "Hogar", "Unidades vendidas": 106, "Ingreso (COP)": 19102000, "Costo (COP)": 11461000, "Margen (COP)": 7641000, "Margen (%)": 0.40001047010784213}, {"Mes": "Mayo", "Región": "Cali", "Categoría": "Hogar", "Unidades vendidas": 108, "Ingreso (COP)": 19484000, "Costo (COP)": 11690000, "Margen (COP)": 7794000, "Margen (%)": 0.40002052966536644}, {"Mes": "Junio", "Región": "Cali", "Categoría": "Hogar", "Unidades vendidas": 110, "Ingreso (COP)": 19873000, "Costo (COP)": 11924000, "Margen (COP)": 7949000, "Margen (%)": 0.39998993609419814}, {"Mes": "Enero", "Región": "Cali", "Categoría": "Moda", "Unidades vendidas": 167, "Ingreso (COP)": 20000000, "Costo (COP)": 10000000, "Margen (COP)": 10000000, "Margen (%)": 0.5}, {"Mes": "Febrero", "Región": "Cali", "Categoría": "Moda", "Unidades vendidas": 168, "Ingreso (COP)": 20200000, "Costo (COP)": 10100000, "Margen (COP)": 10100000, "Margen (%)": 0.5}, {"Mes": "Marzo", "Región": "Cali", "Categoría": "Moda", "Unidades vendidas": 170, "Ingreso (COP)": 20402000, "Costo (COP)": 10201000, "Margen (COP)": 10201000, "Margen (%)": 0.5}, {"Mes": "Abril", "Región": "Cali", "Categoría": "Moda", "Unidades vendidas": 172, "Ingreso (COP)": 20606000, "Costo (COP)": 10303000, "Margen (COP)": 10303000, "Margen (%)": 0.5}, {"Mes": "Mayo", "Región": "Cali", "Categoría": "Moda", "Unidades vendidas": 173, "Ingreso (COP)": 20812000, "Costo (COP)": 10406000, "Margen (COP)": 10406000, "Margen (%)": 0.5}, {"Mes": "Junio", "Región": "Cali", "Categoría": "Moda", "Unidades vendidas": 175, "Ingreso (COP)": 21020000, "Costo (COP)": 10510000, "Margen (COP)": 10510000, "Margen (%)": 0.5}, {"Mes": "Enero", "Región": "Cali", "Categoría": "Deportes", "Unidades vendidas": 112, "Ingreso (COP)": 28000000, "Costo (COP)": 17360000, "Margen (COP)": 10640000, "Margen (%)": 0.38}, {"Mes": "Febrero", "Región": "Cali", "Categoría": "Deportes", "Unidades vendidas": 103, "Ingreso (COP)": 25760000, "Costo (COP)": 15971000, "Margen (COP)": 9789000, "Margen (%)": 0.3800077639751553}, {"Mes": "Marzo", "Región": "Cali", "Categoría": "Deportes", "Unidades vendidas": 95, "Ingreso (COP)": 23699000, "Costo (COP)": 14693000, "Margen (COP)": 9006000, "Margen (%)": 0.3800160344318326}, {"Mes": "Abril", "Región": "Cali", "Categoría": "Deportes", "Unidades vendidas": 87, "Ingreso (COP)": 21803000, "Costo (COP)": 13518000, "Margen (COP)": 8285000, "Margen (%)": 0.3799935788652938}, {"Mes": "Mayo", "Región": "Cali", "Categoría": "Deportes", "Unidades vendidas": 80, "Ingreso (COP)": 20059000, "Costo (COP)": 12437000, "Margen (COP)": 7622000, "Margen (%)": 0.379979061767785}, {"Mes": "Junio", "Región": "Cali", "Categoría": "Deportes", "Unidades vendidas": 74, "Ingreso (COP)": 18454000, "Costo (COP)": 11441000, "Margen (COP)": 7013000, "Margen (%)": 0.38002601062100355}, {"Mes": "Enero", "Región": "Barranquilla", "Categoría": "Electrónica", "Unidades vendidas": 18, "Ingreso (COP)": 15000000, "Costo (COP)": 10800000, "Margen (COP)": 4200000, "Margen (%)": 0.28}, {"Mes": "Febrero", "Región": "Barranquilla", "Categoría": "Electrónica", "Unidades vendidas": 18, "Ingreso (COP)": 15150000, "Costo (COP)": 10908000, "Margen (COP)": 4242000, "Margen (%)": 0.28}, {"Mes": "Marzo", "Región": "Barranquilla", "Categoría": "Electrónica", "Unidades vendidas": 18, "Ingreso (COP)": 15302000, "Costo (COP)": 11017000, "Margen (COP)": 4285000, "Margen (%)": 0.2800287544111881}, {"Mes": "Abril", "Región": "Barranquilla", "Categoría": "Electrónica", "Unidades vendidas": 18, "Ingreso (COP)": 15455000, "Costo (COP)": 11128000, "Margen (COP)": 4327000, "Margen (%)": 0.2799741184082821}, {"Mes": "Mayo", "Región": "Barranquilla", "Categoría": "Electrónica", "Unidades vendidas": 18, "Ingreso (COP)": 15609000, "Costo (COP)": 11238000, "Margen (COP)": 4371000, "Margen (%)": 0.2800307514895253}, {"Mes": "Junio", "Región": "Barranquilla", "Categoría": "Electrónica", "Unidades vendidas": 19, "Ingreso (COP)": 15765000, "Costo (COP)": 11351000, "Margen (COP)": 4414000, "Margen (%)": 0.27998731366952107}, {"Mes": "Enero", "Región": "Barranquilla", "Categoría": "Hogar", "Unidades vendidas": 67, "Ingreso (COP)": 12000000, "Costo (COP)": 7200000, "Margen (COP)": 4800000, "Margen (%)": 0.4}, {"Mes": "Febrero", "Región": "Barranquilla", "Categoría": "Hogar", "Unidades vendidas": 77, "Ingreso (COP)": 13800000, "Costo (COP)": 8280000, "Margen (COP)": 5520000, "Margen (%)": 0.4}, {"Mes": "Marzo", "Región": "Barranquilla", "Categoría": "Hogar", "Unidades vendidas": 88, "Ingreso (COP)": 15870000, "Costo (COP)": 9522000, "Margen (COP)": 6348000, "Margen (%)": 0.4}, {"Mes": "Abril", "Región": "Barranquilla", "Categoría": "Hogar", "Unidades vendidas": 101, "Ingreso (COP)": 18250000, "Costo (COP)": 10950000, "Margen (COP)": 7300000, "Margen (%)": 0.4}, {"Mes": "Mayo", "Región": "Barranquilla", "Categoría": "Hogar", "Unidades vendidas": 117, "Ingreso (COP)": 20988000, "Costo (COP)": 12593000, "Margen (COP)": 8395000, "Margen (%)": 0.39999047074518773}, {"Mes": "Junio", "Región": "Barranquilla", "Categoría": "Hogar", "Unidades vendidas": 134, "Ingreso (COP)": 24136000, "Costo (COP)": 14482000, "Margen (COP)": 9654000, "Margen (%)": 0.3999834272456082}, {"Mes": "Enero", "Región": "Barranquilla", "Categoría": "Moda", "Unidades vendidas": 117, "Ingreso (COP)": 14000000, "Costo (COP)": 7000000, "Margen (COP)": 7000000, "Margen (%)": 0.5}, {"Mes": "Febrero", "Región": "Barranquilla", "Categoría": "Moda", "Unidades vendidas": 119, "Ingreso (COP)": 14280000, "Costo (COP)": 7140000, "Margen (COP)": 7140000, "Margen (%)": 0.5}, {"Mes": "Marzo", "Región": "Barranquilla", "Categoría": "Moda", "Unidades vendidas": 121, "Ingreso (COP)": 14566000, "Costo (COP)": 7283000, "Margen (COP)": 7283000, "Margen (%)": 0.5}, {"Mes": "Abril", "Región": "Barranquilla", "Categoría": "Moda", "Unidades vendidas": 124, "Ingreso (COP)": 14857000, "Costo (COP)": 7428000, "Margen (COP)": 7429000, "Margen (%)": 0.5000336541697517}, {"Mes": "Mayo", "Región": "Barranquilla", "Categoría": "Moda", "Unidades vendidas": 126, "Ingreso (COP)": 15154000, "Costo (COP)": 7577000, "Margen (COP)": 7577000, "Margen (%)": 0.5}, {"Mes": "Junio", "Región": "Barranquilla", "Categoría": "Moda", "Unidades vendidas": 129, "Ingreso (COP)": 15457000, "Costo (COP)": 7728000, "Margen (COP)": 7729000, "Margen (%)": 0.5000323478035842}, {"Mes": "Enero", "Región": "Barranquilla", "Categoría": "Deportes", "Unidades vendidas": 40, "Ingreso (COP)": 10000000, "Costo (COP)": 6200000, "Margen (COP)": 3800000, "Margen (%)": 0.38}, {"Mes": "Febrero", "Región": "Barranquilla", "Categoría": "Deportes", "Unidades vendidas": 40, "Ingreso (COP)": 10100000, "Costo (COP)": 6262000, "Margen (COP)": 3838000, "Margen (%)": 0.38}, {"Mes": "Marzo", "Región": "Barranquilla", "Categoría": "Deportes", "Unidades vendidas": 41, "Ingreso (COP)": 10201000, "Costo (COP)": 6325000, "Margen (COP)": 3876000, "Margen (%)": 0.37996274875012254}, {"Mes": "Abril", "Región": "Barranquilla", "Categoría": "Deportes", "Unidades vendidas": 41, "Ingreso (COP)": 10303000, "Costo (COP)": 6388000, "Margen (COP)": 3915000, "Margen (%)": 0.37998641172474035}, {"Mes": "Mayo", "Región": "Barranquilla", "Categoría": "Deportes", "Unidades vendidas": 42, "Ingreso (COP)": 10406000, "Costo (COP)": 6452000, "Margen (COP)": 3954000, "Margen (%)": 0.3799730924466654}, {"Mes": "Junio", "Región": "Barranquilla", "Categoría": "Deportes", "Unidades vendidas": 42, "Ingreso (COP)": 10510000, "Costo (COP)": 6516000, "Margen (COP)": 3994000, "Margen (%)": 0.38001902949571836}], "logistica": [{"Mes": "Enero", "Región": "Bogotá", "Pedidos totales": 1200, "Entregados a tiempo": 1164, "% Entregas a tiempo": 0.97, "Tiempo promedio de entrega (días)": 1.8, "Devoluciones": 24, "% Devoluciones": 0.02, "Inventario (unidades)": 3400}, {"Mes": "Febrero", "Región": "Bogotá", "Pedidos totales": 1250, "Entregados a tiempo": 1213, "% Entregas a tiempo": 0.9704, "Tiempo promedio de entrega (días)": 1.8, "Devoluciones": 25, "% Devoluciones": 0.02, "Inventario (unidades)": 3500}, {"Mes": "Marzo", "Región": "Bogotá", "Pedidos totales": 1300, "Entregados a tiempo": 1264, "% Entregas a tiempo": 0.9723076923076923, "Tiempo promedio de entrega (días)": 1.9, "Devoluciones": 26, "% Devoluciones": 0.02, "Inventario (unidades)": 3600}, {"Mes": "Abril", "Región": "Bogotá", "Pedidos totales": 1360, "Entregados a tiempo": 1323, "% Entregas a tiempo": 0.9727941176470588, "Tiempo promedio de entrega (días)": 1.9, "Devoluciones": 27, "% Devoluciones": 0.019852941176470587, "Inventario (unidades)": 3550}, {"Mes": "Mayo", "Región": "Bogotá", "Pedidos totales": 1420, "Entregados a tiempo": 1381, "% Entregas a tiempo": 0.9725352112676057, "Tiempo promedio de entrega (días)": 2.0, "Devoluciones": 28, "% Devoluciones": 0.01971830985915493, "Inventario (unidades)": 3650}, {"Mes": "Junio", "Región": "Bogotá", "Pedidos totales": 1480, "Entregados a tiempo": 1439, "% Entregas a tiempo": 0.9722972972972973, "Tiempo promedio de entrega (días)": 2.0, "Devoluciones": 30, "% Devoluciones": 0.02027027027027027, "Inventario (unidades)": 3700}, {"Mes": "Enero", "Región": "Medellín", "Pedidos totales": 900, "Entregados a tiempo": 846, "% Entregas a tiempo": 0.94, "Tiempo promedio de entrega (días)": 2.2, "Devoluciones": 27, "% Devoluciones": 0.03, "Inventario (unidades)": 2800}, {"Mes": "Febrero", "Región": "Medellín", "Pedidos totales": 930, "Entregados a tiempo": 874, "% Entregas a tiempo": 0.9397849462365592, "Tiempo promedio de entrega (días)": 2.2, "Devoluciones": 28, "% Devoluciones": 0.030107526881720432, "Inventario (unidades)": 2850}, {"Mes": "Marzo", "Región": "Medellín", "Pedidos totales": 960, "Entregados a tiempo": 902, "% Entregas a tiempo": 0.9395833333333333, "Tiempo promedio de entrega (días)": 2.3, "Devoluciones": 29, "% Devoluciones": 0.030208333333333334, "Inventario (unidades)": 2900}, {"Mes": "Abril", "Región": "Medellín", "Pedidos totales": 990, "Entregados a tiempo": 930, "% Entregas a tiempo": 0.9393939393939394, "Tiempo promedio de entrega (días)": 2.3, "Devoluciones": 30, "% Devoluciones": 0.030303030303030304, "Inventario (unidades)": 2950}, {"Mes": "Mayo", "Región": "Medellín", "Pedidos totales": 1020, "Entregados a tiempo": 958, "% Entregas a tiempo": 0.9392156862745098, "Tiempo promedio de entrega (días)": 2.3, "Devoluciones": 31, "% Devoluciones": 0.030392156862745098, "Inventario (unidades)": 2980}, {"Mes": "Junio", "Región": "Medellín", "Pedidos totales": 1050, "Entregados a tiempo": 986, "% Entregas a tiempo": 0.939047619047619, "Tiempo promedio de entrega (días)": 2.4, "Devoluciones": 32, "% Devoluciones": 0.030476190476190476, "Inventario (unidades)": 3000}, {"Mes": "Enero", "Región": "Cali", "Pedidos totales": 1000, "Entregados a tiempo": 920, "% Entregas a tiempo": 0.92, "Tiempo promedio de entrega (días)": 2.1, "Devoluciones": 20, "% Devoluciones": 0.02, "Inventario (unidades)": 2600}, {"Mes": "Febrero", "Región": "Cali", "Pedidos totales": 980, "Entregados a tiempo": 862, "% Entregas a tiempo": 0.8795918367346939, "Tiempo promedio de entrega (días)": 2.6, "Devoluciones": 29, "% Devoluciones": 0.02959183673469388, "Inventario (unidades)": 2650}, {"Mes": "Marzo", "Región": "Cali", "Pedidos totales": 960, "Entregados a tiempo": 787, "% Entregas a tiempo": 0.8197916666666667, "Tiempo promedio de entrega (días)": 3.2, "Devoluciones": 38, "% Devoluciones": 0.03958333333333333, "Inventario (unidades)": 2700}, {"Mes": "Abril", "Región": "Cali", "Pedidos totales": 940, "Entregados a tiempo": 705, "% Entregas a tiempo": 0.75, "Tiempo promedio de entrega (días)": 3.9, "Devoluciones": 47, "% Devoluciones": 0.05, "Inventario (unidades)": 2750}, {"Mes": "Mayo", "Región": "Cali", "Pedidos totales": 920, "Entregados a tiempo": 635, "% Entregas a tiempo": 0.6902173913043478, "Tiempo promedio de entrega (días)": 4.6, "Devoluciones": 55, "% Devoluciones": 0.059782608695652176, "Inventario (unidades)": 2800}, {"Mes": "Junio", "Región": "Cali", "Pedidos totales": 900, "Entregados a tiempo": 567, "% Entregas a tiempo": 0.63, "Tiempo promedio de entrega (días)": 5.3, "Devoluciones": 63, "% Devoluciones": 0.07, "Inventario (unidades)": 2850}, {"Mes": "Enero", "Región": "Barranquilla", "Pedidos totales": 500, "Entregados a tiempo": 450, "% Entregas a tiempo": 0.9, "Tiempo promedio de entrega (días)": 2.0, "Devoluciones": 15, "% Devoluciones": 0.03, "Inventario (unidades)": 800}, {"Mes": "Febrero", "Región": "Barranquilla", "Pedidos totales": 560, "Entregados a tiempo": 498, "% Entregas a tiempo": 0.8892857142857142, "Tiempo promedio de entrega (días)": 2.1, "Devoluciones": 22, "% Devoluciones": 0.039285714285714285, "Inventario (unidades)": 700}, {"Mes": "Marzo", "Región": "Barranquilla", "Pedidos totales": 640, "Entregados a tiempo": 563, "% Entregas a tiempo": 0.8796875, "Tiempo promedio de entrega (días)": 2.3, "Devoluciones": 38, "% Devoluciones": 0.059375, "Inventario (unidades)": 600}, {"Mes": "Abril", "Región": "Barranquilla", "Pedidos totales": 740, "Entregados a tiempo": 629, "% Entregas a tiempo": 0.85, "Tiempo promedio de entrega (días)": 2.6, "Devoluciones": 52, "% Devoluciones": 0.07027027027027027, "Inventario (unidades)": 500}, {"Mes": "Mayo", "Región": "Barranquilla", "Pedidos totales": 860, "Entregados a tiempo": 705, "% Entregas a tiempo": 0.8197674418604651, "Tiempo promedio de entrega (días)": 2.9, "Devoluciones": 69, "% Devoluciones": 0.08023255813953488, "Inventario (unidades)": 420}, {"Mes": "Junio", "Región": "Barranquilla", "Pedidos totales": 1000, "Entregados a tiempo": 800, "% Entregas a tiempo": 0.8, "Tiempo promedio de entrega (días)": 3.2, "Devoluciones": 90, "% Devoluciones": 0.09, "Inventario (unidades)": 350}]};
+  var VENTAS = DATA.ventas, LOG = DATA.logistica;
+  var MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio"];
+  var REGIONES = ["Barranquilla","Bogotá","Cali","Medellín"];
+  var CATS = ["Deportes","Electrónica","Hogar","Moda"];
+  var COLOR_BLUE = getCss('--blue'), COLOR_GOLD = getCss('--gold');
+
+  function getCss(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+  function fmtCOP(n){ return "$" + Math.round(n).toLocaleString('es-CO'); }
+  function fmtCOPk(n){
+    if (Math.abs(n) >= 1e6) return "$" + (n/1e6).toLocaleString('es-CO',{maximumFractionDigits:1}) + "M";
+    return "$" + Math.round(n).toLocaleString('es-CO');
+  }
+  function fmtPct(n){ return (n*100).toLocaleString('es-CO',{maximumFractionDigits:1}) + "%"; }
+  function fmtN(n){ return Math.round(n).toLocaleString('es-CO'); }
+  function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+
+  // ---------------- state ----------------
+  var state = { mes:"Todos", region:"Todas", cat:"Todas" };
+
+  function fillSelect(id, opts, current){
+    var el = document.getElementById(id);
+    el.innerHTML = opts.map(function(o){ return '<option value="'+esc(o)+'"'+(o===current?' selected':'')+'>'+esc(o)+'</option>'; }).join('');
+  }
+  fillSelect('f-mes', ["Todos"].concat(MESES), state.mes);
+  fillSelect('f-region', ["Todas"].concat(REGIONES), state.region);
+  fillSelect('f-cat', ["Todas"].concat(CATS), state.cat);
+
+  document.getElementById('f-mes').addEventListener('change', function(e){ state.mes = e.target.value; render(); });
+  document.getElementById('f-region').addEventListener('change', function(e){ state.region = e.target.value; render(); });
+  document.getElementById('f-cat').addEventListener('change', function(e){ state.cat = e.target.value; render(); });
+  document.getElementById('reset').addEventListener('click', function(){
+    state = { mes:"Todos", region:"Todas", cat:"Todas" };
+    document.getElementById('f-mes').value = "Todos";
+    document.getElementById('f-region').value = "Todas";
+    document.getElementById('f-cat').value = "Todas";
+    render();
+  });
+
+  // ---------------- filtering ----------------
+  function filterVentas(s){
+    return VENTAS.filter(function(r){
+      return (s.mes==="Todos" || r.Mes===s.mes) &&
+             (s.region==="Todas" || r["Región"]===s.region) &&
+             (s.cat==="Todas" || r["Categoría"]===s.cat);
+    });
+  }
+  function filterLog(s){
+    return LOG.filter(function(r){
+      return (s.mes==="Todos" || r.Mes===s.mes) &&
+             (s.region==="Todas" || r["Región"]===s.region);
+    });
+  }
+
+  // ---------------- aggregation (mirrors validated DAX measures) ----------------
+  function aggVentas(rows){
+    var ingresos=0, costo=0, margen=0, unidades=0;
+    rows.forEach(function(r){ ingresos+=r["Ingreso (COP)"]; costo+=r["Costo (COP)"]; margen+=r["Margen (COP)"]; unidades+=r["Unidades vendidas"]; });
+    return { ingresos:ingresos, costo:costo, margen:margen, margenPct: ingresos? margen/ingresos : null, unidades:unidades };
+  }
+  function aggLog(rows){
+    var pedidos=0, entregados=0, dev=0, tiempoW=0, inv=0;
+    rows.forEach(function(r){
+      pedidos+=r["Pedidos totales"]; entregados+=r["Entregados a tiempo"]; dev+=r["Devoluciones"];
+      tiempoW += r["Tiempo promedio de entrega (días)"] * r["Pedidos totales"];
+      inv += r["Inventario (unidades)"];
+    });
+    return {
+      pedidos:pedidos, entregados:entregados, devoluciones:dev,
+      pctEntregas: pedidos? entregados/pedidos : null,
+      pctDev: pedidos? dev/pedidos : null,
+      tiempoProm: pedidos? tiempoW/pedidos : null,
+      inventarioProm: rows.length? inv/rows.length : null
+    };
+  }
+
+  function prevMonth(m){ var i = MESES.indexOf(m); return i>0 ? MESES[i-1] : null; }
+  function lastMonthWithData(rows){
+    for(var i=MESES.length-1;i>=0;i--){ if(rows.some(function(r){return r.Mes===MESES[i];})) return MESES[i]; }
+    return null;
+  }
+  // Inventario = último mes disponible dentro del alcance de Región seleccionado (Categoría no aplica a Logística),
+  // sumado entre las regiones visibles en ese mes (es una foto de stock por periodo, no un flujo acumulable en el tiempo).
+  function inventarioKPI(s){
+    var regionRows = LOG.filter(function(r){ return s.region==="Todas" || r["Región"]===s.region; });
+    var mes = s.mes!=="Todos" ? s.mes : lastMonthWithData(regionRows);
+    if(!mes) return { mes:null, total:null, prevMes:null, prevTotal:null };
+    var rowsMes = regionRows.filter(function(r){ return r.Mes===mes; });
+    var total = rowsMes.reduce(function(a,r){ return a+r["Inventario (unidades)"]; }, 0);
+    var pm = prevMonth(mes);
+    var prevTotal = null;
+    if(pm){
+      var rowsPrev = regionRows.filter(function(r){ return r.Mes===pm; });
+      if(rowsPrev.length) prevTotal = rowsPrev.reduce(function(a,r){ return a+r["Inventario (unidades)"]; }, 0);
+    }
+    return { mes:mes, total: rowsMes.length?total:null, prevMes:pm, prevTotal:prevTotal };
+  }
+
+  // ---------------- render ----------------
+  function render(){
+    var vRows = filterVentas(state), lRows = filterLog(state);
+    var v = aggVentas(vRows), l = aggLog(lRows);
+    var inv = inventarioKPI(state);
+
+    var scope = [];
+    if(state.mes!=="Todos") scope.push(state.mes);
+    if(state.region!=="Todas") scope.push(state.region);
+    if(state.cat!=="Todas") scope.push(state.cat);
+    var scopeTxt = scope.length? scope.join(" · ") : "Todos los meses / regiones / categorías";
+    document.getElementById('kpi-scope').textContent = scopeTxt;
+    document.getElementById('alert-scope').textContent = scopeTxt;
+
+    renderKPIs(v, l, inv);
+    renderLineVentas(vRows);
+    renderBarRegion(vRows);
+    renderTablaCategoria(vRows);
+    renderLineLog(lRows);
+    renderBarDevoluciones(lRows);
+    renderTablaRegion(lRows);
+    renderNarrative(v, l, inv, vRows, lRows);
+    renderAlerts(v, l);
+    renderWatchCards();
+  }
+
+  function deltaBadge(curr, prevRows_v, prevRows_l, kind, key){
+    if(state.mes==="Todos") return '<span class="delta flat">— sin variación (selecciona un mes)</span>';
+    var pm = prevMonth(state.mes);
+    if(!pm) return '<span class="delta flat">— primer mes del periodo</span>';
+    var pState = { mes:pm, region:state.region, cat:state.cat };
+    var prevVal;
+    if(kind==='ventas'){ prevVal = aggVentas(filterVentas(pState))[key]; }
+    else { prevVal = aggLog(filterLog(pState))[key]; }
+    if(curr==null || prevVal==null || prevVal===0) return '<span class="delta flat">— sin dato previo</span>';
+    var d = (curr - prevVal) / Math.abs(prevVal);
+    var cls = Math.abs(d) < 0.001 ? 'flat' : (d>0 ? 'up':'down');
+    var arrow = cls==='up' ? '▲' : (cls==='down' ? '▼' : '—');
+    return '<span class="delta '+cls+'">'+arrow+' '+fmtPct(Math.abs(d))+' vs '+esc(pm)+'</span>';
+  }
+
+  function inventarioDelta(inv){
+    if(inv.total==null) return '<span class="delta flat">— sin dato</span>';
+    if(inv.prevTotal==null || inv.prevTotal===0) return '<span class="delta flat">— sin dato previo ('+esc(inv.prevMes||'—')+')</span>';
+    var d = (inv.total - inv.prevTotal) / Math.abs(inv.prevTotal);
+    var cls = Math.abs(d) < 0.001 ? 'flat' : (d>0 ? 'up':'down');
+    var arrow = cls==='up' ? '▲' : (cls==='down' ? '▼' : '—');
+    return '<span class="delta '+cls+'">'+arrow+' '+fmtPct(Math.abs(d))+' vs '+esc(inv.prevMes)+'</span>';
+  }
+
+  function renderKPIs(v,l,inv){
+    var tiles = [
+      { lbl:"Ingresos", val: fmtCOPk(v.ingresos), badge: deltaBadge(v.ingresos,null,null,'ventas','ingresos') },
+      { lbl:"Margen", val: fmtCOPk(v.margen), badge: deltaBadge(v.margen,null,null,'ventas','margen') },
+      { lbl:"Margen %", val: v.margenPct!=null?fmtPct(v.margenPct):"—", badge: deltaBadge(v.margenPct,null,null,'ventas','margenPct') },
+      { lbl:"Unidades vendidas", val: fmtN(v.unidades), badge: deltaBadge(v.unidades,null,null,'ventas','unidades') },
+      { lbl:"Pedidos totales", val: fmtN(l.pedidos), badge: deltaBadge(l.pedidos,null,null,'log','pedidos') },
+      { lbl:"% Entregas a tiempo", val: l.pctEntregas!=null?fmtPct(l.pctEntregas):"—", badge: deltaBadge(l.pctEntregas,null,null,'log','pctEntregas') },
+      { lbl:"Tiempo prom. entrega", val: l.tiempoProm!=null?l.tiempoProm.toLocaleString('es-CO',{maximumFractionDigits:1})+" días":"—", badge: deltaBadge(l.tiempoProm,null,null,'log','tiempoProm') },
+      { lbl:"% Devoluciones", val: l.pctDev!=null?fmtPct(l.pctDev):"—", badge: deltaBadge(l.pctDev,null,null,'log','pctDev') },
+      { lbl:"Inventario · "+(inv.mes||"—"), val: inv.total!=null?fmtN(inv.total)+" u.":"—", badge: inventarioDelta(inv),
+        sub: (state.mes==="Todos" && l.inventarioProm!=null) ? ("Promedio del periodo filtrado: "+fmtN(l.inventarioProm)+" u./mes-región") : null }
+    ];
+    document.getElementById('kpi-grid').innerHTML = tiles.map(function(t){
+      return '<div class="kpi"><div class="lbl">'+esc(t.lbl)+'</div><div class="val">'+t.val+'</div>'+t.badge+
+        (t.sub? '<div style="font-size:10.5px;color:var(--muted);margin-top:6px">'+esc(t.sub)+'</div>' : '')+
+        '</div>';
+    }).join('');
+  }
+
+  // ---- SVG helpers ----
+  var W = 520, H = 220, PAD = {l:38,r:14,t:12,b:26};
+
+  function svgOpen(w,h){ return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" style="max-width:100%;height:auto;display:block" role="img">'; }
+
+  function lineChart(containerId, seriesA, seriesB, labelsX, nameA, nameB, colorA, colorB, fmtY){
+    var allVals = seriesA.concat(seriesB).filter(function(v){return v!=null;});
+    var maxV = Math.max.apply(null, allVals.concat([0])) * 1.15 || 1;
+    var minV = 0;
+    var innerW = W-PAD.l-PAD.r, innerH = H-PAD.t-PAD.b;
+    function x(i){ return PAD.l + innerW * (i/(labelsX.length-1)); }
+    function y(v){ return PAD.t + innerH * (1 - (v-minV)/(maxV-minV)); }
+
+    var svg = svgOpen(W,H);
+    // gridlines
+    var gridN = 4;
+    for(var g=0; g<=gridN; g++){
+      var gv = maxV*g/gridN;
+      var gy = y(gv);
+      svg += '<line class="gridline" x1="'+PAD.l+'" x2="'+(W-PAD.r)+'" y1="'+gy+'" y2="'+gy+'"/>';
+      svg += '<text class="axis-lbl" x="4" y="'+(gy+3)+'">'+fmtY(gv)+'</text>';
+    }
+    // x labels
+    labelsX.forEach(function(lb,i){
+      svg += '<text class="axis-lbl" x="'+x(i)+'" y="'+(H-8)+'" text-anchor="middle">'+esc(lb.slice(0,3))+'</text>';
+    });
+    function path(series){
+      var pts = series.map(function(v,i){ return v==null?null:[x(i),y(v)]; }).filter(Boolean);
+      return pts.map(function(p,i){ return (i===0?'M':'L')+p[0].toFixed(1)+' '+p[1].toFixed(1); }).join(' ');
+    }
+    function dots(series, color, name){
+      return series.map(function(v,i){
+        if(v==null) return '';
+        return '<circle cx="'+x(i)+'" cy="'+y(v)+'" r="3.4" fill="'+color+'" stroke="var(--surface)" stroke-width="1.5"><title>'+esc(name)+' · '+labelsX[i]+': '+fmtY(v)+'</title></circle>';
+      }).join('');
+    }
+    svg += '<path d="'+path(seriesA)+'" fill="none" stroke="'+colorA+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>';
+    if(seriesB) svg += '<path d="'+path(seriesB)+'" fill="none" stroke="'+colorB+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>';
+    svg += dots(seriesA, colorA, nameA);
+    if(seriesB) svg += dots(seriesB, colorB, nameB);
+    svg += '</svg>';
+    document.getElementById(containerId).innerHTML = svg;
+  }
+
+  function barChart(containerId, cats, vals, color, fmtY){
+    var maxV = Math.max.apply(null, vals.concat([0])) * 1.2 || 1;
+    var innerW = W-PAD.l-PAD.r, innerH = H-PAD.t-PAD.b;
+    var n = cats.length;
+    var slot = innerW/n, barW = Math.min(56, slot*0.55);
+    function y(v){ return PAD.t + innerH * (1 - v/maxV); }
+    var svg = svgOpen(W,H);
+    var gridN=4;
+    for(var g=0; g<=gridN; g++){
+      var gv=maxV*g/gridN, gy=y(gv);
+      svg += '<line class="gridline" x1="'+PAD.l+'" x2="'+(W-PAD.r)+'" y1="'+gy+'" y2="'+gy+'"/>';
+    }
+    cats.forEach(function(c,i){
+      var cx = PAD.l + slot*i + slot/2;
+      var v = vals[i];
+      var by = y(v);
+      var bh = (PAD.t+innerH) - by;
+      svg += '<rect x="'+(cx-barW/2)+'" y="'+by+'" width="'+barW+'" height="'+bh+'" rx="4" fill="'+color+'"><title>'+esc(c)+': '+fmtY(v)+'</title></rect>';
+      svg += '<text class="val-lbl" x="'+cx+'" y="'+(by-6)+'" text-anchor="middle">'+fmtY(v)+'</text>';
+      svg += '<text class="axis-lbl" x="'+cx+'" y="'+(H-8)+'" text-anchor="middle">'+esc(c)+'</text>';
+    });
+    svg += '</svg>';
+    document.getElementById(containerId).innerHTML = svg;
+  }
+
+  function renderLineVentas(vRows){
+    var ing = MESES.map(function(m){ var rs=vRows.filter(function(r){return r.Mes===m;}); return rs.length? aggVentas(rs).ingresos : null; });
+    var mar = MESES.map(function(m){ var rs=vRows.filter(function(r){return r.Mes===m;}); return rs.length? aggVentas(rs).margen : null; });
+    lineChart('chart-line-ventas', ing, mar, MESES, 'Ingresos', 'Margen', COLOR_BLUE, COLOR_GOLD, fmtCOPk);
+  }
+  function renderBarRegion(vRows){
+    var vals = REGIONES.map(function(r){ return aggVentas(vRows.filter(function(x){return x["Región"]===r;})).ingresos; });
+    barChart('chart-bar-region', REGIONES, vals, COLOR_BLUE, fmtCOPk);
+  }
+  function renderLineLog(lRows){
+    var pe = MESES.map(function(m){ var rs=lRows.filter(function(r){return r.Mes===m;}); return rs.length? aggLog(rs).pctEntregas : null; });
+    lineChart('chart-line-log', pe, null, MESES, '% Entregas a tiempo', null, getCss('--green'), null, fmtPct);
+  }
+  function renderBarDevoluciones(lRows){
+    var vals = REGIONES.map(function(r){ return aggLog(lRows.filter(function(x){return x["Región"]===r;})).devoluciones; });
+    barChart('chart-bar-dev', REGIONES, vals, getCss('--red'), fmtN);
+  }
+
+  function renderTablaCategoria(vRows){
+    var rows = CATS.map(function(c){
+      var rs = vRows.filter(function(r){return r["Categoría"]===c;});
+      var a = aggVentas(rs);
+      return {c:c, a:a};
+    }).sort(function(a,b){ return b.a.ingresos - a.a.ingresos; });
+    var html = '<thead><tr><th>Categoría</th><th>Ingresos</th><th>Margen</th><th>Margen %</th></tr></thead><tbody>';
+    rows.forEach(function(r){
+      html += '<tr><td>'+esc(r.c)+'</td><td>'+fmtCOP(r.a.ingresos)+'</td><td>'+fmtCOP(r.a.margen)+'</td><td>'+(r.a.margenPct!=null?fmtPct(r.a.margenPct):'—')+'</td></tr>';
+    });
+    html += '</tbody>';
+    document.getElementById('tbl-categoria').innerHTML = html;
+  }
+
+  function renderTablaRegion(lRows){
+    var rows = REGIONES.map(function(r){
+      var rs = lRows.filter(function(x){return x["Región"]===r;});
+      var a = aggLog(rs);
+      return {r:r, a:a};
+    }).sort(function(a,b){ return (b.a.pctEntregas||0) - (a.a.pctEntregas||0); });
+    var html = '<thead><tr><th>Región</th><th>Pedidos</th><th>Entregados a tiempo</th><th>% Entregas</th><th>Devoluciones</th><th>Tiempo prom.</th></tr></thead><tbody>';
+    rows.forEach(function(r){
+      var cls = r.a.pctEntregas!=null && r.a.pctEntregas < 0.9 ? 'neg' : '';
+      html += '<tr><td>'+esc(r.r)+'</td><td>'+fmtN(r.a.pedidos)+'</td><td>'+fmtN(r.a.entregados)+'</td><td class="'+cls+'">'+(r.a.pctEntregas!=null?fmtPct(r.a.pctEntregas):'—')+'</td><td>'+fmtN(r.a.devoluciones)+'</td><td>'+(r.a.tiempoProm!=null?r.a.tiempoProm.toLocaleString('es-CO',{maximumFractionDigits:1})+' d':'—')+'</td></tr>';
+    });
+    html += '</tbody>';
+    document.getElementById('tbl-region').innerHTML = html;
+  }
+
+  // ---------------- lectura ejecutiva (dinámica según filtros) ----------------
+  function trendSeries(items, key){
+    // primer y último valor no-nulo de una serie mensual ya agregada
+    var withVal = items.filter(function(p){ return p.v!=null; });
+    if(withVal.length<2) return null;
+    var first = withVal[0], last = withVal[withVal.length-1];
+    if(!first.v) return null;
+    return { first:first, last:last, pct:(last.v-first.v)/Math.abs(first.v) };
+  }
+  function trendPhrase(pct, growWord, fallWord){
+    if(pct==null) return "se mantiene sin variación suficiente para describir una tendencia";
+    var abs = fmtPct(Math.abs(pct));
+    if(Math.abs(pct) < 0.02) return "se mantiene relativamente estable (" + abs + ")";
+    return (pct>0? growWord : fallWord) + " " + abs;
+  }
+
+  function renderNarrative(v,l,inv,vRows,lRows){
+    document.getElementById('narr-scope').textContent = "Lectura calculada sobre el alcance actual de los filtros: " + document.getElementById('kpi-scope').textContent;
+
+    // series de ingresos y margen % dentro del alcance Región/Categoría (para describir tendencia, no un solo punto)
+    var ingSeries = MESES.map(function(m){
+      var rs = VENTAS.filter(function(r){ return r.Mes===m && (state.region==="Todas"||r["Región"]===state.region) && (state.cat==="Todas"||r["Categoría"]===state.cat); });
+      return { m:m, v: rs.length? aggVentas(rs).ingresos : null };
+    });
+    var margenPctSeries = MESES.map(function(m){
+      var rs = VENTAS.filter(function(r){ return r.Mes===m && (state.region==="Todas"||r["Región"]===state.region) && (state.cat==="Todas"||r["Categoría"]===state.cat); });
+      return { m:m, v: rs.length? aggVentas(rs).margenPct : null };
+    });
+    var entregasSeries = MESES.map(function(m){
+      var rs = LOG.filter(function(r){ return r.Mes===m && (state.region==="Todas"||r["Región"]===state.region); });
+      return { m:m, v: rs.length? aggLog(rs).pctEntregas : null };
+    });
+    var devSeries = MESES.map(function(m){
+      var rs = LOG.filter(function(r){ return r.Mes===m && (state.region==="Todas"||r["Región"]===state.region); });
+      return { m:m, v: rs.length? aggLog(rs).pctDev : null };
+    });
+
+    var tIng = trendSeries(ingSeries), tMargen = trendSeries(margenPctSeries), tEnt = trendSeries(entregasSeries), tDev = trendSeries(devSeries);
+    var singleMonth = state.mes!=="Todos";
+
+    // Ventas
+    var ventasTxt;
+    if(v.ingresos===0){
+      ventasTxt = "No hay ventas registradas para la combinación de filtros seleccionada.";
+    } else if(singleMonth){
+      ventasTxt = "En " + esc(state.mes) + " los ingresos fueron de <b>" + fmtCOP(v.ingresos) + "</b>, con " + fmtN(v.unidades) + " unidades vendidas" + (state.cat!=="Todas"?" en "+esc(state.cat):"") + (state.region!=="Todas"?" en "+esc(state.region):"") + ".";
+    } else {
+      ventasTxt = "En el periodo enero–junio, los ingresos " + trendPhrase(tIng?tIng.pct:null,"presentan una tendencia creciente de","presentan una tendencia decreciente de") + " entre el primer y el último mes con datos" + (state.region!=="Todas"?" en "+esc(state.region):"") + (state.cat!=="Todas"?" para "+esc(state.cat):"") + ".";
+    }
+
+    // Rentabilidad
+    var rentTxt;
+    if(v.margenPct==null){
+      rentTxt = "No hay margen calculable para este alcance de filtros.";
+    } else {
+      rentTxt = "El margen % actual es de <b>" + fmtPct(v.margenPct) + "</b>" + (v.margenPct<0.30?", por debajo del umbral analítico de referencia (30%), lo que conviene revisar por categoría/región":", en línea con el umbral analítico de referencia (30%)") + ". " +
+        (singleMonth? "" : "A lo largo del periodo, el margen % " + trendPhrase(tMargen?tMargen.pct:null,"muestra una mejora de","presenta una caída de") + ".");
+    }
+
+    // Logística
+    var logTxt;
+    if(l.pctEntregas==null){
+      logTxt = "No hay datos de logística para este alcance de filtros.";
+    } else {
+      logTxt = "% Entregas a tiempo actual: <b>" + fmtPct(l.pctEntregas) + "</b>, % Devoluciones: <b>" + fmtPct(l.pctDev) + "</b>. " +
+        (singleMonth? "" : "En el periodo, las entregas a tiempo " + trendPhrase(tEnt?tEnt.pct:null,"mejoran","se deterioran") + " y las devoluciones " + trendPhrase(tDev?tDev.pct:null,"aumentan","disminuyen") + ", lo que requiere seguimiento si la tendencia es negativa.");
+    }
+
+    // Atención — solo cuando el alcance incluye señales relevantes (Cali/Barranquilla) o es agregado
+    var atencionTxt;
+    var incluyeSenal = state.region==="Todas" || state.region==="Cali" || state.region==="Barranquilla";
+    if(incluyeSenal){
+      atencionTxt = "Las señales más notorias del periodo se concentran en <b>Cali</b> (caída sostenida en entregas a tiempo) y <b>Barranquilla</b> (crecimiento de pedidos junto con caída de inventario) — ver detalle en \"Situaciones que requieren seguimiento\". Podrían estar asociadas a capacidad operativa o a la relación oferta/demanda regional, pero esto es una hipótesis a validar, no una conclusión confirmada por los datos.";
+    } else {
+      atencionTxt = "Para " + esc(state.region) + " no se observan señales de deterioro tan marcadas como las de Cali o Barranquilla en el periodo analizado; aun así, conviene monitorear devoluciones y tiempos de entrega de forma periódica.";
+    }
+
+    var blocks = [
+      { color:"var(--blue)", lbl:"Ventas", html:ventasTxt },
+      { color:"var(--gold)", lbl:"Rentabilidad", html:rentTxt },
+      { color:"var(--green)", lbl:"Logística", html:logTxt },
+      { color:"var(--red)", lbl:"Atención", html:atencionTxt }
+    ];
+    document.getElementById('narrative-grid').innerHTML = blocks.map(function(b){
+      return '<div class="narr-block"><div class="narr-lbl"><span class="dot" style="background:'+b.color+'"></span>'+esc(b.lbl)+'</div><p>'+b.html+'</p></div>';
+    }).join('');
+  }
+
+  // ---------------- situaciones que requieren seguimiento (Cali / Barranquilla, periodo completo) ----------------
+  function regionEneroJunio(region){
+    var ene = LOG.find(function(r){ return r["Región"]===region && r.Mes==="Enero"; });
+    var jun = LOG.find(function(r){ return r["Región"]===region && r.Mes==="Junio"; });
+    return { ene:ene, jun:jun };
+  }
+  function pp(a,b){ return ((b-a)*100).toLocaleString('es-CO',{maximumFractionDigits:1})+" pp"; }
+  function mult(a,b){ return "x"+(b/a).toLocaleString('es-CO',{maximumFractionDigits:1}); }
+
+  function renderWatchCards(){
+    var cali = regionEneroJunio("Cali");
+    var barr = regionEneroJunio("Barranquilla");
+    var cards = [];
+
+    if(cali.ene && cali.jun){
+      cards.push({
+        region:"Cali", badge:"Logística",
+        metrics:[
+          { name:"% Entregas a tiempo", from:fmtPct(cali.ene["% Entregas a tiempo"]), to:fmtPct(cali.jun["% Entregas a tiempo"]), delta:pp(cali.ene["% Entregas a tiempo"],cali.jun["% Entregas a tiempo"]), bad:true },
+          { name:"Tiempo prom. de entrega", from:cali.ene["Tiempo promedio de entrega (días)"]+" d", to:cali.jun["Tiempo promedio de entrega (días)"]+" d", delta:mult(cali.ene["Tiempo promedio de entrega (días)"],cali.jun["Tiempo promedio de entrega (días)"]), bad:true },
+          { name:"Devoluciones", from:fmtN(cali.ene["Devoluciones"]), to:fmtN(cali.jun["Devoluciones"]), delta:mult(cali.ene["Devoluciones"],cali.jun["Devoluciones"]), bad:true }
+        ],
+        note:"<b>Se observa</b> una caída sostenida en entregas a tiempo y un aumento paralelo en tiempo de entrega y devoluciones, mes a mes, entre enero y junio. La coincidencia en el tiempo <b>no confirma una causa</b>; es una relación que conviene investigar.",
+        investigate:"Revisaría capacidad operativa, tiempos de preparación/despacho, cobertura logística y causas de devolución antes de definir una acción."
+      });
+    }
+    if(barr.ene && barr.jun){
+      cards.push({
+        region:"Barranquilla", badge:"Operación",
+        metrics:[
+          { name:"Pedidos totales", from:fmtN(barr.ene["Pedidos totales"]), to:fmtN(barr.jun["Pedidos totales"]), delta:mult(barr.ene["Pedidos totales"],barr.jun["Pedidos totales"]), bad:false },
+          { name:"% Entregas a tiempo", from:fmtPct(barr.ene["% Entregas a tiempo"]), to:fmtPct(barr.jun["% Entregas a tiempo"]), delta:pp(barr.ene["% Entregas a tiempo"],barr.jun["% Entregas a tiempo"]), bad:true },
+          { name:"Inventario", from:fmtN(barr.ene["Inventario (unidades)"])+" u.", to:fmtN(barr.jun["Inventario (unidades)"])+" u.", delta:pp(0,0), bad:true, custom:((barr.jun["Inventario (unidades)"]-barr.ene["Inventario (unidades)"])/barr.ene["Inventario (unidades)"]*100).toLocaleString('es-CO',{maximumFractionDigits:0})+"%" }
+        ],
+        note:"<b>Se observa</b> que los pedidos casi se duplican mientras el inventario cae y las entregas a tiempo empeoran. Esto <b>podría estar asociado</b> a que la capacidad operativa no creció al mismo ritmo que la demanda — es una hipótesis, no una conclusión confirmada.",
+        investigate:"Revisaría la relación entre crecimiento de pedidos, disponibilidad de inventario y capacidad de distribución."
+      });
+    }
+
+    document.getElementById('watch-grid').innerHTML = cards.map(function(c){
+      var metricsHtml = c.metrics.map(function(m){
+        var deltaTxt = m.custom!=null ? m.custom : m.delta;
+        return '<div class="watch-metric"><span class="wm-name">'+esc(m.name)+' ('+esc(m.from)+' → '+esc(m.to)+')</span><span class="wm-change" style="color:'+(m.bad?'var(--bad-fg)':'var(--good-fg)')+'">'+deltaTxt+'</span></div>';
+      }).join('');
+      return '<div class="watch-card"><h4>'+esc(c.region)+' <span class="badge">'+esc(c.badge)+'</span></h4>'+
+        '<div class="watch-metrics">'+metricsHtml+'</div>'+
+        '<div class="watch-note">'+c.note+'</div>'+
+        '<div class="watch-investigate"><span class="il">Qué investigaría</span>'+esc(c.investigate)+'</div>'+
+        '</div>';
+    }).join('');
+  }
+
+  function renderAlerts(v,l){
+    var alerts = [];
+    // Regla 1: Margen %
+    var mOk = v.margenPct!=null && v.margenPct >= 0.30;
+    alerts.push({
+      ok:mOk, title:"Margen %", metric: v.margenPct!=null?fmtPct(v.margenPct):"—",
+      msg: mOk ? "Hallazgo: el margen actual está en o por encima del umbral analítico propuesto" : "Hallazgo: el margen actual está por debajo del umbral analítico propuesto",
+      rule: "Regla de monitoreo propuesta: alertar si Margen % &lt; 30%. No es un estándar provisto en los datos originales."
+    });
+    // Regla 2: Entregas a tiempo
+    var eOk = l.pctEntregas!=null && l.pctEntregas >= 0.90;
+    alerts.push({
+      ok:eOk, title:"% Entregas a tiempo", metric: l.pctEntregas!=null?fmtPct(l.pctEntregas):"—",
+      msg: eOk ? "Hallazgo: el nivel de servicio actual cumple el umbral analítico propuesto" : "Hallazgo: el nivel de servicio actual está por debajo del umbral analítico propuesto",
+      rule: "Regla de monitoreo propuesta: alertar si % Entregas a tiempo &lt; 90%."
+    });
+    // Regla 3: Devoluciones
+    var dOk = l.pctDev!=null && l.pctDev <= 0.05;
+    alerts.push({
+      ok:dOk, title:"% Devoluciones", metric: l.pctDev!=null?fmtPct(l.pctDev):"—",
+      msg: dOk ? "Hallazgo: las devoluciones actuales están dentro del rango analítico propuesto" : "Hallazgo: las devoluciones actuales superan el rango analítico propuesto",
+      rule: "Regla de monitoreo propuesta: alertar si % Devoluciones &gt; 5%."
+    });
+    document.getElementById('alert-grid').innerHTML = alerts.map(function(a){
+      return '<div class="alert '+(a.ok?'good':'bad')+'"><div class="stripe"></div><div class="body">'+
+        '<div class="head"><span>'+esc(a.title)+'</span><span>'+(a.ok?'🟢':'🔴')+'</span></div>'+
+        '<div class="metric">'+a.metric+'</div>'+
+        '<div style="font-size:12.5px;margin-top:3px">'+esc(a.msg)+'</div>'+
+        '<div class="kind">Regla de monitoreo propuesta</div>'+
+        '<div class="rule">'+a.rule+'</div>'+
+        '</div></div>';
+    }).join('');
+  }
+
+  render();
+
+  window.addEventListener('resize', function(){ /* SVGs are viewBox-scaled, no-op */ });
+})();
+</script>
